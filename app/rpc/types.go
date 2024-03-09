@@ -1,6 +1,7 @@
 package rpc
 
 import (
+	"auth/app/models"
 	pb "auth/proto"
 
 	"github.com/rs/zerolog"
@@ -13,4 +14,5 @@ type Server struct {
 }
 
 type RPCIface interface {
+	GetUserByEmail(email string) (models.User, error)
 }
