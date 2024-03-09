@@ -7,18 +7,21 @@ import (
 	jwt "auth/libs/jwt"
 	pb "auth/proto"
 
+	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func (s *Server) Login(ctx context.Context, in *pb.LoginRequest) (*pb.LoginResponce, error) {
 	user, err := s.PG.GetUserByEmail(in.GetEmail())
 	if err != nil {
-		s.Log.Error().Err(err).Stack()
+		s.Log.Error("error while getting user",
+			zap.Error(err))
 		return nil, err
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Pwdhash), []byte(in.GetPassword())); err != nil {
-		s.Log.Error().Err(err).Stack()
+		s.Log.Error("error while comparing pwd and hash",
+			zap.Error(err))
 		return nil, err
 	}
 
@@ -29,7 +32,8 @@ func (s *Server) Login(ctx context.Context, in *pb.LoginRequest) (*pb.LoginRespo
 		Role:      string(user.Role),
 	})
 	if err != nil {
-		s.Log.Error().Err(err).Stack()
+		s.Log.Error("error while generating access token",
+			zap.Error(err))
 		return nil, err
 	}
 
@@ -40,7 +44,8 @@ func (s *Server) Login(ctx context.Context, in *pb.LoginRequest) (*pb.LoginRespo
 		Role:      string(user.Role),
 	})
 	if err != nil {
-		s.Log.Error().Err(err).Stack()
+		s.Log.Error("error while generating refresh token",
+			zap.Error(err))
 		return nil, err
 	}
 

@@ -1,20 +1,21 @@
 package jwt
 
 import (
+	"auth/utils"
 	"fmt"
 	"os"
 	"time"
-
-	"github.com/rs/zerolog/log"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
 var key = []byte(os.Getenv("JWT_SECRET"))
 
+var logger = utils.InitZap()
+
 func Generate(payload Payload) (string, error) {
 	if err := payload.Valid(); err != nil {
-		log.Error().Err(err).Stack()
+		logger.Error(err.Error())
 		return "", err
 	}
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
@@ -25,7 +26,7 @@ func Generate(payload Payload) (string, error) {
 		"contactId": payload.ContactId,
 	}).SignedString(key)
 	if err != nil {
-		log.Error().Err(err).Stack()
+		logger.Error(err.Error())
 		return "", err
 	}
 
@@ -42,7 +43,7 @@ func Verify(tokenString string) error {
 	}
 
 	if !token.Valid {
-		log.Error().Msg("invalid token")
+		logger.Error(err.Error())
 		return fmt.Errorf("invalid token")
 	}
 
@@ -51,7 +52,7 @@ func Verify(tokenString string) error {
 
 func ReissueAccessToken(refresh string) (string, error) {
 	if err := Verify(refresh); err != nil {
-		log.Error().Err(err).Stack()
+		logger.Error(err.Error())
 		return "", err
 	}
 
@@ -59,7 +60,7 @@ func ReissueAccessToken(refresh string) (string, error) {
 		return key, nil
 	})
 	if err != nil {
-		log.Error().Err(err).Stack()
+		logger.Error(err.Error())
 		return "", err
 	}
 
@@ -77,7 +78,7 @@ func GetPayload(token string) (jwt.MapClaims, error) {
 		return key, nil
 	})
 	if err != nil {
-		log.Error().Err(err).Stack()
+		logger.Error(err.Error())
 		return nil, err
 	}
 

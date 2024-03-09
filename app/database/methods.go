@@ -5,6 +5,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5"
+	"go.uber.org/zap"
 )
 
 func (p *Postgres) GetUserByEmail(email string) (models.User, error) {
@@ -13,13 +14,15 @@ func (p *Postgres) GetUserByEmail(email string) (models.User, error) {
 	FROM users_schema.user
 	WHERE email=$1`, email)
 	if err != nil {
-		p.Log.Error().Err(err).Stack()
+		p.Log.Error("error while selecting user",
+			zap.Error(err))
 		return models.User{}, err
 	}
 
-	user, err := pgx.RowToStructByName[models.User](row)
+	user, err := pgx.CollectOneRow[models.User](row, pgx.RowToStructByName[models.User])
 	if err != nil {
-		p.Log.Error().Err(err).Stack()
+		p.Log.Error("error while selecting user",
+			zap.Error(err))
 		return models.User{}, err
 	}
 

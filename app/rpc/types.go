@@ -4,13 +4,13 @@ import (
 	"auth/app/models"
 	pb "auth/proto"
 
-	"github.com/rs/zerolog"
+	"go.uber.org/zap"
 )
 
 type Server struct {
 	pb.UnimplementedAuthServer
 	PG  RPCIface
-	Log *zerolog.Logger
+	Log *zap.Logger
 }
 
 type RPCIface interface {

@@ -7,8 +7,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
+	"go.uber.org/zap"
 )
 
 type PgxIface interface {
@@ -22,7 +21,7 @@ type PgxIface interface {
 
 type Postgres struct {
 	DB  PgxIface
-	Log *zerolog.Logger
+	Log *zap.Logger
 }
 
 var (
@@ -30,14 +29,14 @@ var (
 	pgOnce     sync.Once
 )
 
-func NewPG(ctx context.Context, DSN string) (*Postgres, error) {
+func NewPG(ctx context.Context, DSN string, logger *zap.Logger) (*Postgres, error) {
 	pgOnce.Do(func() {
 		db, err := pgxpool.New(ctx, DSN)
 		if err != nil {
-			log.Fatal().Err(err)
+			logger.Fatal("error while creating pool", zap.Error(err))
 		}
 
-		pgInstance = &Postgres{DB: db}
+		pgInstance = &Postgres{DB: db, Log: logger}
 	})
 
 	return pgInstance, nil

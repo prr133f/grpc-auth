@@ -2,13 +2,16 @@ package utils
 
 import (
 	"os"
+	"strings"
 
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
+	"go.uber.org/zap"
 )
 
-func InitLogger() zerolog.Logger {
-	logger := log.Output(zerolog.ConsoleWriter{Out: os.Stderr}).Level(zerolog.DebugLevel)
+func InitZap() *zap.Logger {
+	logger := zap.Must(zap.NewProduction())
+	if strings.EqualFold(os.Getenv("APP_STATUS"), "debug") {
+		logger = zap.Must(zap.NewDevelopment())
+	}
 
 	return logger
 }
