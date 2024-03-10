@@ -18,7 +18,7 @@ func insertDefaultUser(p *database.Postgres) error {
 	defaultUser := models.User{
 		Email:   os.Getenv("DEFAULTUSER_EMAIL"),
 		Pwdhash: string(pwdhash),
-		Role:    models.Admin,
+		Role:    models.Role(os.Getenv("DEFAULTUSER_ROLE")),
 	}
 	if _, err := p.DB.Exec(context.Background(), `
 	INSERT INTO users_schema.user(email, pwdhash, role)

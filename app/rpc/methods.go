@@ -54,3 +54,15 @@ func (s *Server) Login(ctx context.Context, in *pb.LoginRequest) (*pb.LoginRespo
 		RefreshToken: refreshToken,
 	}, nil
 }
+
+func (s *Server) UpdateSession(ctx context.Context, in *pb.RefreshToken) (*pb.AccessToken, error) {
+	accessToken, err := jwt.ReissueAccessToken(in.GetToken())
+	if err != nil {
+		s.Log.Error("error while reissue access token", zap.Error(err))
+		return nil, err
+	}
+
+	return &pb.AccessToken{
+		Token: accessToken,
+	}, nil
+}

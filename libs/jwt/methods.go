@@ -65,7 +65,7 @@ func ReissueAccessToken(refresh string) (string, error) {
 	}
 
 	return Generate(Payload{
-		ID:        token.Claims.(jwt.MapClaims)["id"].(int64),
+		ID:        int64(token.Claims.(jwt.MapClaims)["id"].(float64)),
 		Email:     token.Claims.(jwt.MapClaims)["sub"].(string),
 		ExpiresAt: time.Now().Add(time.Minute * 15).Unix(),
 		Role:      token.Claims.(jwt.MapClaims)["role"].(string),
