@@ -25,7 +25,7 @@ func TestGenerate(t *testing.T) {
 	})
 	assert.Nil(t, err)
 
-	assert.Equal(t, 1, access.Claims.(jwt.MapClaims)["id"].(int64))
+	assert.Equal(t, 1, int(access.Claims.(jwt.MapClaims)["id"].(float64)))
 	assert.Equal(t, "admin", access.Claims.(jwt.MapClaims)["role"].(string))
 }
 
