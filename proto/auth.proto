@@ -31,5 +31,4 @@ message None {}
 service Auth {
     rpc Login(LoginRequest) returns (LoginResponce);
     rpc UpdateSession(RefreshToken) returns (AccessToken);
-    rpc TestStream(None) returns (stream Data);
 }

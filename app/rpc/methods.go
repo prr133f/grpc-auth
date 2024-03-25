@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	jwt "auth/libs/jwt"
+	"auth/libs/jwt"
 	pb "auth/proto"
 
 	"go.uber.org/zap"

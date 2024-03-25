@@ -24,7 +24,6 @@ const _ = grpc.SupportPackageIsVersion7
 type AuthClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponce, error)
 	UpdateSession(ctx context.Context, in *RefreshToken, opts ...grpc.CallOption) (*AccessToken, error)
-	TestStream(ctx context.Context, in *None, opts ...grpc.CallOption) (Auth_TestStreamClient, error)
 }
 
 type authClient struct {
@@ -53,45 +52,12 @@ func (c *authClient) UpdateSession(ctx context.Context, in *RefreshToken, opts .
 	return out, nil
 }
 
-func (c *authClient) TestStream(ctx context.Context, in *None, opts ...grpc.CallOption) (Auth_TestStreamClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Auth_ServiceDesc.Streams[0], "/auth.Auth/TestStream", opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &authTestStreamClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-type Auth_TestStreamClient interface {
-	Recv() (*Data, error)
-	grpc.ClientStream
-}
-
-type authTestStreamClient struct {
-	grpc.ClientStream
-}
-
-func (x *authTestStreamClient) Recv() (*Data, error) {
-	m := new(Data)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
 // AuthServer is the server API for Auth service.
 // All implementations must embed UnimplementedAuthServer
 // for forward compatibility
 type AuthServer interface {
 	Login(context.Context, *LoginRequest) (*LoginResponce, error)
 	UpdateSession(context.Context, *RefreshToken) (*AccessToken, error)
-	TestStream(*None, Auth_TestStreamServer) error
 	mustEmbedUnimplementedAuthServer()
 }
 
@@ -104,9 +70,6 @@ func (UnimplementedAuthServer) Login(context.Context, *LoginRequest) (*LoginResp
 }
 func (UnimplementedAuthServer) UpdateSession(context.Context, *RefreshToken) (*AccessToken, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateSession not implemented")
-}
-func (UnimplementedAuthServer) TestStream(*None, Auth_TestStreamServer) error {
-	return status.Errorf(codes.Unimplemented, "method TestStream not implemented")
 }
 func (UnimplementedAuthServer) mustEmbedUnimplementedAuthServer() {}
 
@@ -157,27 +120,6 @@ func _Auth_UpdateSession_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Auth_TestStream_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(None)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(AuthServer).TestStream(m, &authTestStreamServer{stream})
-}
-
-type Auth_TestStreamServer interface {
-	Send(*Data) error
-	grpc.ServerStream
-}
-
-type authTestStreamServer struct {
-	grpc.ServerStream
-}
-
-func (x *authTestStreamServer) Send(m *Data) error {
-	return x.ServerStream.SendMsg(m)
-}
-
 // Auth_ServiceDesc is the grpc.ServiceDesc for Auth service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -194,12 +136,6 @@ var Auth_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Auth_UpdateSession_Handler,
 		},
 	},
-	Streams: []grpc.StreamDesc{
-		{
-			StreamName:    "TestStream",
-			Handler:       _Auth_TestStream_Handler,
-			ServerStreams: true,
-		},
-	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "proto/auth.proto",
 }

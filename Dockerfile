@@ -10,6 +10,8 @@ COPY . ./
 
 RUN CGO_ENABLED=0 GOOS=linux go build ./app/server 
 
+RUN go install github.com/pressly/goose/cmd/goose@latest
+
 EXPOSE 50051
 
-CMD ["./server"]
+CMD ["sh", "-c", "goose -dir sql/migrations up && ./server"]
