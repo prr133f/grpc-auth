@@ -22,7 +22,14 @@ message AccessToken {
     string token = 1;
 }
 
+message Data {
+    string data = 1;
+}
+
+message None {}
+
 service Auth {
     rpc Login(LoginRequest) returns (LoginResponce);
     rpc UpdateSession(RefreshToken) returns (AccessToken);
+    rpc TestStream(None) returns (stream Data);
 }
