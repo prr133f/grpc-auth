@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGenerate(t *testing.T) {
+func TestJWT_TestGenerate(t *testing.T) {
 	payload := Payload{
 		ID:        1,
 		Email:     "test@gmail.com",
@@ -29,7 +29,7 @@ func TestGenerate(t *testing.T) {
 	assert.Equal(t, "admin", access.Claims.(jwt.MapClaims)["role"].(string))
 }
 
-func TestGenerateWrongPayload(t *testing.T) {
+func TestJWT_TestGenerateWrongPayload(t *testing.T) {
 	payloads := []Payload{{
 		ID:        1,
 		Email:     "arraabba",
@@ -54,7 +54,7 @@ func TestGenerateWrongPayload(t *testing.T) {
 	}
 }
 
-func TestVerify(t *testing.T) {
+func TestJWT_TestVerify(t *testing.T) {
 	validToken, err := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
 		"id":   1,
 		"sub":  "testmail@gmail.com",
