@@ -26,7 +26,7 @@ func (s *Server) Login(ctx context.Context, in *pb.LoginRequest) (*pb.LoginRespo
 	}
 
 	accessToken, err := jwt.Generate(jwt.Payload{
-		ID:        user.ID,
+		ID:        int64(user.ID),
 		Email:     user.Email,
 		ExpiresAt: time.Now().Add(15 * time.Minute).Unix(),
 		Role:      string(user.Role),
@@ -38,7 +38,7 @@ func (s *Server) Login(ctx context.Context, in *pb.LoginRequest) (*pb.LoginRespo
 	}
 
 	refreshToken, err := jwt.Generate(jwt.Payload{
-		ID:        user.ID,
+		ID:        int64(user.ID),
 		Email:     user.Email,
 		ExpiresAt: time.Now().Add(30 * 24 * time.Hour).Unix(),
 		Role:      string(user.Role),

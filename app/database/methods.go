@@ -4,7 +4,6 @@ import (
 	"auth/app/models"
 	"context"
 
-	"github.com/jackc/pgx/v5"
 	"go.uber.org/zap"
 )
 
@@ -19,12 +18,19 @@ func (p *Postgres) GetUserByEmail(email string) (models.User, error) {
 		return models.User{}, err
 	}
 
-	user, err := pgx.CollectOneRow[models.User](row, pgx.RowToStructByName[models.User])
-	if err != nil {
-		p.Log.Error("error while selecting user",
+	var user models.User
+	var strole string
+	if err := row.Scan(
+		&user.ID,
+		&user.Email,
+		&user.Pwdhash,
+		&strole,
+	); err != nil {
+		p.Log.Error(err.Error(),
 			zap.Error(err))
 		return models.User{}, err
 	}
+	user.Role = models.Role(strole)
 
 	return user, nil
 }

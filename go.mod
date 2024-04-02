@@ -25,6 +25,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/jackc/pgx/v5 v5.5.4
+	github.com/pashagolub/pgxmock/v3 v3.3.0
 	github.com/stretchr/testify v1.9.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/net v0.20.0 // indirect

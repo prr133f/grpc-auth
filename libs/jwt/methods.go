@@ -43,7 +43,7 @@ func Verify(tokenString string) error {
 	}
 
 	if !token.Valid {
-		logger.Error(err.Error())
+		logger.Error("invalid token")
 		return fmt.Errorf("invalid token")
 	}
 
